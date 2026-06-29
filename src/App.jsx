@@ -6,28 +6,33 @@ import SessionPage from './pages/SessionPage'
 import HistoryPage from './pages/HistoryPage'
 import ProgressPage from './pages/ProgressPage'
 
-function NavBar({ signOut }) {
-  const linkClass = ({ isActive }) =>
-    `flex flex-col items-center text-xs gap-1 px-3 py-1 ${isActive ? 'text-blue-600' : 'text-gray-400'}`
-
+function NavBar() {
+  const links = [
+    { to: '/', icon: '🏠', label: 'Accueil' },
+    { to: '/history', icon: '📋', label: 'Historique' },
+    { to: '/progress', icon: '📈', label: 'Stats' },
+  ]
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex justify-around py-2 z-50">
-      <NavLink to="/" end className={linkClass}>
-        <span className="text-xl">🏠</span>
-        <span>Home</span>
-      </NavLink>
-      <NavLink to="/history" className={linkClass}>
-        <span className="text-xl">📋</span>
-        <span>Historique</span>
-      </NavLink>
-      <NavLink to="/progress" className={linkClass}>
-        <span className="text-xl">📈</span>
-        <span>Progrès</span>
-      </NavLink>
-      <button onClick={signOut} className="flex flex-col items-center text-xs text-gray-400 gap-1 px-3 py-1">
-        <span className="text-xl">🚪</span>
-        <span>Sortir</span>
-      </button>
+    <nav style={{
+      position: 'fixed', bottom: 0, left: 0, right: 0,
+      background: 'var(--bg-surface)',
+      borderTop: '1px solid var(--border)',
+      display: 'flex',
+      paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+      zIndex: 50
+    }}>
+      {links.map(({ to, icon, label }) => (
+        <NavLink key={to} to={to} end={to === '/'} style={({ isActive }) => ({
+          flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center',
+          justifyContent: 'center', padding: '10px 0', textDecoration: 'none',
+          color: isActive ? '#6366f1' : '#64748b',
+          fontSize: 10, fontWeight: isActive ? 700 : 500, gap: 3,
+          transition: 'color 0.15s'
+        })}>
+          <span style={{ fontSize: 22 }}>{icon}</span>
+          {label}
+        </NavLink>
+      ))}
     </nav>
   )
 }
@@ -57,7 +62,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
-      <NavBar signOut={signOut} />
+      <NavBar />
     </BrowserRouter>
   )
 }

@@ -23,25 +23,28 @@ export default function ReadinessForm({ userId, onSubmit }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
-      <h2 className="text-sm font-bold text-gray-800 mb-3">Comment tu te sens aujourd'hui ?</h2>
+    <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 16, padding: 16, marginBottom: 16 }}>
+      <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-primary)', margin: '0 0 16px' }}>
+        Comment tu te sens aujourd'hui ?
+      </h2>
       {QUESTIONS.map(q => (
-        <div key={q.key} className="mb-3">
-          <div className="flex justify-between text-xs text-gray-600 mb-1">
-            <span>{q.emoji} {q.label}</span>
-            <span className="font-bold text-blue-600">{scores[q.key]}/5</span>
+        <div key={q.key} style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{q.emoji} {q.label}</span>
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#818cf8' }}>{scores[q.key]}/5</span>
           </div>
           <input
             type="range" min="1" max="5" value={scores[q.key]}
             onChange={e => setScores(s => ({ ...s, [q.key]: parseInt(e.target.value) }))}
-            className="w-full accent-blue-600"
+            style={{ width: '100%', accentColor: '#6366f1' }}
           />
         </div>
       ))}
       <button
         onClick={handleSubmit}
         disabled={saving}
-        className="w-full bg-blue-600 text-white rounded-xl py-2.5 text-sm font-semibold mt-1 disabled:opacity-50"
+        className="btn-primary"
+        style={{ marginTop: 4, opacity: saving ? 0.5 : 1 }}
       >
         {saving ? 'Enregistrement...' : 'Valider mon état'}
       </button>

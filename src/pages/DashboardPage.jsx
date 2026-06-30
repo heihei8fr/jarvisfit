@@ -2,82 +2,126 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProgram } from '../hooks/useProgram'
-import { SESSION_TYPES } from '../data/program'
+import { useHistory } from '../hooks/useHistory'
+import { useStreak } from '../hooks/useStreak'
 import ReadinessForm from '../components/ReadinessForm'
 import WeekRing from '../components/WeekRing'
-
-function Spinner() {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
-}
+import StreakBadge from '../components/StreakBadge'
+import TrainingWeather from '../components/TrainingWeather'
+import WeekStats from '../components/WeekStats'
 
 export default function DashboardPage() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const { todayProgram, weekPrograms, lastAnalysis, loading } = useProgram(user?.id)
-  const [readinessDone, setReadinessDone] = useState(false)
+  const { sessions } = useHistory(user?.id)
+  const { current: streakCurrent, best: streakBest } = useStreak(sessions)
+  const [readiness, setReadiness] = useState(null)
+  const [showAnalysis, setShowAnalysis] = useState(false)
   const navigate = useNavigate()
 
-  const trainingSessions = weekPrograms.filter(p => p.session_type !== 'REPOS' && p.session_type !== 'BILAN')
-  const sessionType = todayProgram ? SESSION_TYPES[todayProgram.session_type] : null
+  if (loading) return (
+    <div style={{ minHeight:'100dvh', display:'flex', alignItems:'center', justifyContent:'center', background:'var(--bg-base)' }}>
+      <div style={{ width:40, height:40, borderRadius:'50%', border:'3px solid var(--border)', borderTopColor:'#6366f1', animation:'spin 0.8s linear infinite' }} />
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  )
 
-  if (loading) return <Spinner />
+  const completedThisWeek = weekPrograms?.filter(p => p.completed).length || 0
+  const totalThisWeek = weekPrograms?.length || 7
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="flex justify-between items-start mb-6 pt-2">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">Bonjour Anthony 👋</h1>
-          <p className="text-sm text-gray-500">
-            {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
-          </p>
-        </div>
-        <WeekRing completed={0} total={trainingSessions.length} />
-      </div>
-
-      {!readinessDone && (
-        <ReadinessForm userId={user.id} onSubmit={() => setReadinessDone(true)} />
-      )}
-
-      {todayProgram && todayProgram.session_type !== 'REPOS' && todayProgram.session_type !== 'BILAN' ? (
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-3xl">{sessionType?.emoji || '🏋️'}</span>
-            <div>
-              <h2 className="text-base font-bold text-gray-900">{todayProgram.session_type}</h2>
-              <p className="text-xs text-gray-500">{todayProgram.exercises?.length} exercices · {todayProgram.label}</p>
-            </div>
+    <div style={{ background:'var(--bg-base)', minHeight:'100dvh', paddingBottom:80 }}>
+      {/* Header */}
+      <div style={{ padding:'48px 20px 20px', background:'linear-gradient(180deg,#0d0d1a 0%,var(--bg-base) 100%)' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+          <div>
+            <p style={{ color:'var(--text-secondary)', fontSize:12, margin:'0 0 4px', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em' }}>
+              {new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}
+            </p>
+            <h1 style={{ fontSize:26, fontWeight:800, margin:0, color:'var(--text-primary)' }}>
+              Bonjour Anthony 👋
+            </h1>
           </div>
-          <p className="text-xs text-gray-400 mb-4 line-clamp-2">
-            {todayProgram.exercises?.slice(0, 4).map(e => e.name).join(' · ')}
-            {todayProgram.exercises?.length > 4 ? ` · +${todayProgram.exercises.length - 4}` : ''}
-          </p>
-          <button
-            onClick={() => navigate(`/session/${todayProgram.id}`)}
-            className="w-full bg-blue-600 text-white rounded-xl py-3 font-semibold text-sm"
-          >
-            Démarrer la séance 🏋️
+          <button onClick={signOut} style={{ background:'var(--bg-elevated)', border:'1px solid var(--border)', borderRadius:10, padding:'6px 12px', color:'var(--text-secondary)', fontSize:12, cursor:'pointer' }}>
+            Déco
           </button>
         </div>
-      ) : (
-        <div className="bg-gray-50 rounded-2xl border border-gray-100 p-4 mb-4 text-center">
-          <span className="text-3xl mb-2 block">😴</span>
-          <p className="text-sm font-semibold text-gray-700">Jour de repos</p>
-          <p className="text-xs text-gray-400">Marche légère et étirements recommandés</p>
-        </div>
-      )}
+      </div>
 
-      {lastAnalysis && (
-        <div className="bg-blue-50 rounded-2xl border border-blue-100 p-4">
-          <h3 className="text-xs font-bold text-blue-800 mb-2">🤖 Dernière analyse Claude</h3>
-          <p className="text-xs text-blue-700 leading-relaxed line-clamp-4">{lastAnalysis.recommendation}</p>
-          <p className="text-xs text-blue-400 mt-2">
-            {new Date(lastAnalysis.created_at).toLocaleDateString('fr-FR')}
-          </p>
+      <div style={{ padding:'0 16px', display:'flex', flexDirection:'column', gap:14 }} className="animate-slide-up">
+
+        {/* Stats row */}
+        <div style={{ display:'flex', gap:12, alignItems:'center' }}>
+          <div style={{ flex:1 }}><WeekStats sessions={sessions} /></div>
+          <WeekRing completed={completedThisWeek} total={totalThisWeek} />
         </div>
-      )}
+
+        {/* Streak */}
+        <StreakBadge current={streakCurrent} best={streakBest} />
+
+        {/* Disponibilité */}
+        <ReadinessForm userId={user?.id} onSave={setReadiness} />
+
+        {/* Météo entraînement */}
+        {readiness && <TrainingWeather readiness={readiness} />}
+
+        {/* Programme du jour */}
+        {todayProgram ? (
+          <div className="card" style={{ borderColor:'#6366f130' }}>
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+              <div>
+                <span className="badge badge-accent" style={{ marginBottom:6, display:'inline-block' }}>Aujourd'hui</span>
+                <h2 style={{ fontSize:20, fontWeight:800, margin:0, color:'var(--text-primary)' }}>
+                  {todayProgram.session_type || 'Séance'}
+                </h2>
+              </div>
+              <div style={{ textAlign:'right' }}>
+                <div style={{ fontSize:24, fontWeight:800, color:'#6366f1' }}>{todayProgram.exercises?.length || 0}</div>
+                <div style={{ fontSize:11, color:'var(--text-secondary)' }}>exercices</div>
+              </div>
+            </div>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:16 }}>
+              {(todayProgram.exercises||[]).slice(0,4).map((ex,i) => (
+                <span key={i} className="badge badge-accent" style={{ fontSize:11 }}>{ex.name}</span>
+              ))}
+              {(todayProgram.exercises?.length||0) > 4 && (
+                <span className="badge" style={{ background:'var(--bg-elevated)', color:'var(--text-secondary)', fontSize:11 }}>
+                  +{todayProgram.exercises.length - 4}
+                </span>
+              )}
+            </div>
+            <button className="btn-primary" onClick={() => navigate(`/session/${todayProgram.id}`)}>
+              🚀 Démarrer la séance
+            </button>
+          </div>
+        ) : (
+          <div className="card" style={{ textAlign:'center', padding:32 }}>
+            <div style={{ fontSize:40, marginBottom:8 }}>🌙</div>
+            <p style={{ color:'var(--text-secondary)', margin:0, fontWeight:600 }}>Repos mérité</p>
+            <p style={{ color:'var(--text-secondary)', fontSize:13, margin:'6px 0 0', opacity:0.6 }}>Pas de séance prévue aujourd'hui</p>
+          </div>
+        )}
+
+        {/* Dernière analyse Claude */}
+        {lastAnalysis && (
+          <div className="card">
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <div style={{ width:28, height:28, borderRadius:8, background:'linear-gradient(135deg,#6366f1,#8b5cf6)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 }}>🤖</div>
+                <span style={{ fontSize:14, fontWeight:700, color:'var(--text-primary)' }}>Analyse Claude</span>
+              </div>
+              <button onClick={() => setShowAnalysis(!showAnalysis)} style={{ background:'none', border:'none', color:'#818cf8', fontSize:12, cursor:'pointer', fontWeight:600 }}>
+                {showAnalysis ? 'Masquer' : 'Voir'}
+              </button>
+            </div>
+            {showAnalysis && (
+              <div style={{ fontSize:13, color:'var(--text-secondary)', lineHeight:1.7, background:'var(--bg-elevated)', borderRadius:10, padding:12, maxHeight:200, overflowY:'auto' }}>
+                {lastAnalysis.recommendation}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

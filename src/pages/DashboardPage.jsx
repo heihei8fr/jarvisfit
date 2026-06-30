@@ -13,6 +13,8 @@ import TrainingWeather from '../components/TrainingWeather'
 import WeekStats from '../components/WeekStats'
 import ACWRAlert from '../components/ACWRAlert'
 import PainLogger from '../components/PainLogger'
+import NutritionTracker from '../components/NutritionTracker'
+import { useBodyWeight } from '../hooks/useBodyWeight'
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
@@ -26,6 +28,7 @@ export default function DashboardPage() {
   }, [profile, profileLoading])
   const { sessions } = useHistory(user?.id)
   const { current: streakCurrent, best: streakBest } = useStreak(sessions)
+  const { current: currentWeight } = useBodyWeight(user?.id)
   const [readiness, setReadiness] = useState(null)
   const [showAnalysis, setShowAnalysis] = useState(false)
   const navigate = useNavigate()
@@ -156,6 +159,9 @@ export default function DashboardPage() {
 
         {/* Suivi douleurs */}
         <PainLogger />
+
+        {/* Nutrition */}
+        <NutritionTracker weightKg={currentWeight} />
 
         {/* Bilan hebdomadaire */}
         <div

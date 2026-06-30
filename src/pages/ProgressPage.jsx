@@ -4,6 +4,8 @@ import { useHistory } from '../hooks/useHistory'
 import PRChart from '../components/PRChart'
 import WeightTracker from '../components/WeightTracker'
 import ActivityCalendar from '../components/ActivityCalendar'
+import VolumeChart from '../components/VolumeChart'
+import MuscleChart from '../components/MuscleChart'
 
 const TRACKED_EXERCISES = [
   'Développé couché barre',
@@ -43,6 +45,11 @@ export default function ProgressPage() {
 
       <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
         <ActivityCalendar sessions={sessions || []} />
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <VolumeChart sessions={sessions || []} />
+          <MuscleChart sessions={sessions || []} />
+        </div>
         <WeightTracker />
 
         {/* Exercise selector */}

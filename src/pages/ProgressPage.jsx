@@ -6,6 +6,7 @@ import WeightTracker from '../components/WeightTracker'
 import ActivityCalendar from '../components/ActivityCalendar'
 import VolumeChart from '../components/VolumeChart'
 import MuscleChart from '../components/MuscleChart'
+import ORMCalculator from '../components/ORMCalculator'
 
 const TRACKED_EXERCISES = [
   'Développé couché barre',
@@ -50,6 +51,7 @@ export default function ProgressPage() {
           <VolumeChart sessions={sessions || []} />
           <MuscleChart sessions={sessions || []} />
         </div>
+        <ORMCalculator />
         <WeightTracker />
 
         {/* Exercise selector */}

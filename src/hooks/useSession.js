@@ -37,6 +37,14 @@ export function useSession(program) {
     updateSet(exerciseIdx, setIdx, 'done', true)
   }
 
+  function setExerciseNote(exerciseIdx, note) {
+    setExercisesDone(prev => {
+      const next = [...prev]
+      next[exerciseIdx] = { ...next[exerciseIdx], note }
+      return next
+    })
+  }
+
   function getDurationMinutes() {
     return Math.round((Date.now() - startTime) / 60000)
   }
@@ -45,5 +53,5 @@ export function useSession(program) {
     return exercisesDone.filter(ex => ex.sets.some(s => s.done))
   }
 
-  return { exercisesDone, updateSet, markSetDone, getDurationMinutes, getCompletedExercises }
+  return { exercisesDone, updateSet, markSetDone, setExerciseNote, getDurationMinutes, getCompletedExercises }
 }

@@ -109,7 +109,7 @@ function SetRowPro({ set, setIdx, exerciseIdx, onUpdate, onDone }) {
   )
 }
 
-function ExerciseBlockPro({ exercise, exerciseIdx, onUpdate, onSetDone, sessions }) {
+function ExerciseBlockPro({ exercise, exerciseIdx, onUpdate, onSetDone, sessions, noteOpen, setNoteOpen, onSetNote }) {
   function handleSetDone(exIdx, setIdx) {
     onSetDone(exIdx, setIdx)
   }
@@ -159,6 +159,32 @@ function ExerciseBlockPro({ exercise, exerciseIdx, onUpdate, onSetDone, sessions
         />
       ))}
 
+      {/* Bouton note */}
+      <button
+        onClick={() => setNoteOpen(prev => ({ ...prev, [exerciseIdx]: !prev[exerciseIdx] }))}
+        style={{
+          background: 'none', border: 'none',
+          color: exercise.note ? 'var(--accent)' : 'var(--text-muted)',
+          fontSize: 12, fontWeight: 600, cursor: 'pointer',
+          padding: '6px 12px', display: 'flex', alignItems: 'center', gap: 6
+        }}
+      >
+        📝 {exercise.note ? 'Note : ' + exercise.note.slice(0, 30) + (exercise.note.length > 30 ? '...' : '') : 'Ajouter une note'}
+      </button>
+
+      {noteOpen[exerciseIdx] && (
+        <div style={{ padding: '0 12px 12px' }}>
+          <textarea
+            className="input-dark"
+            placeholder="Note sur cet exercice..."
+            value={exercise.note || ''}
+            onChange={e => onSetNote(exerciseIdx, e.target.value)}
+            rows={2}
+            style={{ resize: 'none', fontSize: 13 }}
+          />
+        </div>
+      )}
+
     </div>
   )
 }
@@ -193,13 +219,14 @@ export default function SessionPage() {
     return () => clearInterval(interval)
   }, [])
 
-  const { exercisesDone, updateSet, markSetDone, getDurationMinutes, getCompletedExercises } =
+  const { exercisesDone, updateSet, markSetDone, setExerciseNote, getDurationMinutes, getCompletedExercises } =
     useSession(program)
 
   const { sessions, getOneRepMaxHistory } = useHistory(user?.id)
   const [prAlert, setPrAlert] = useState(null)
   const [prs, setPrs] = useState([])
   const [restTimer, setRestTimer] = useState(null) // { exerciseName, seconds }
+  const [noteOpen, setNoteOpen] = useState({})
 
   function getRestSeconds(exerciseName) {
     const compound = ['squat', 'bench', 'deadlift', 'press', 'row', 'pull', 'soulevé', 'développé', 'tirage']
@@ -384,6 +411,9 @@ export default function SessionPage() {
             onUpdate={updateSet}
             onSetDone={handleSetDone}
             sessions={sessions}
+            noteOpen={noteOpen}
+            setNoteOpen={setNoteOpen}
+            onSetNote={setExerciseNote}
           />
         ))}
 

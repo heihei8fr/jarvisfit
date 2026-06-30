@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { useHistory } from '../hooks/useHistory'
 import PRChart from '../components/PRChart'
+import WeightTracker from '../components/WeightTracker'
 
 const TRACKED_EXERCISES = [
   'Développé couché barre',
@@ -35,7 +36,9 @@ export default function ProgressPage() {
     <div className="min-h-screen bg-gray-50 p-4 max-w-lg mx-auto">
       <h1 className="text-xl font-bold text-gray-900 mb-4 pt-2">Progression</h1>
 
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+      <WeightTracker />
+
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide mt-4">
         {TRACKED_EXERCISES.map(ex => (
           <button
             key={ex}

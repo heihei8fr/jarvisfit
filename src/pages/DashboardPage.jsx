@@ -11,6 +11,8 @@ import WeekRing from '../components/WeekRing'
 import StreakBadge from '../components/StreakBadge'
 import TrainingWeather from '../components/TrainingWeather'
 import WeekStats from '../components/WeekStats'
+import WeekComparison from '../components/WeekComparison'
+import FormScore from '../components/FormScore'
 import ACWRAlert from '../components/ACWRAlert'
 import PainLogger from '../components/PainLogger'
 import NutritionTracker from '../components/NutritionTracker'
@@ -82,11 +84,17 @@ export default function DashboardPage() {
 
       <div style={{ padding:'0 16px', display:'flex', flexDirection:'column', gap:14 }} className="animate-slide-up">
 
+        {/* Score de forme */}
+        <FormScore sessions={sessions || []} />
+
         {/* Stats row */}
         <div style={{ display:'flex', gap:12, alignItems:'center' }}>
           <div style={{ flex:1 }}><WeekStats sessions={sessions} /></div>
           <WeekRing completed={completedThisWeek} total={totalThisWeek} />
         </div>
+
+        {/* Comparaison semaine vs S-1 */}
+        <WeekComparison sessions={sessions || []} />
 
         {/* Streak */}
         <StreakBadge current={streakCurrent} best={streakBest} />
@@ -125,7 +133,7 @@ export default function DashboardPage() {
                 </span>
               )}
             </div>
-            <button className="btn-primary" onClick={() => navigate(`/session/${todayProgram.id}`)}>
+            <button className="btn-primary pressable" onClick={() => navigate(`/session/${todayProgram.id}`)}>
               🚀 Démarrer la séance
             </button>
           </div>

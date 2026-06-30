@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate, NavLink } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
+import InstallPrompt from './components/InstallPrompt'
 import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import SessionPage from './pages/SessionPage'
@@ -63,6 +64,7 @@ export default function App() {
         </Routes>
       </div>
       <NavBar />
+      <InstallPrompt />
     </BrowserRouter>
   )
 }

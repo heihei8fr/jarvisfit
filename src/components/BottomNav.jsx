@@ -5,7 +5,7 @@ const NAV_ITEMS = [
   { to: '/session', icon: '⚡', label: 'Séance' },
   { to: '/program', icon: '📅', label: 'Programme' },
   { to: '/history', icon: '🕐', label: 'Historique' },
-  { to: '/progress', icon: '📊', label: 'Stats' },
+  { to: '/profile', icon: '👤', label: 'Profil' },
 ]
 
 export default function BottomNav() {

@@ -12,6 +12,7 @@ import SessionDetailPage from './pages/SessionDetailPage'
 import SessionSummaryPage from './pages/SessionSummaryPage'
 import WeeklyReviewPage from './pages/WeeklyReviewPage'
 import OnboardingPage from './pages/OnboardingPage'
+import ProfilePage from './pages/ProfilePage'
 
 function Spinner() {
   return (
@@ -41,6 +42,7 @@ export default function App() {
             <Route path="/session/summary" element={<SessionSummaryPage />} />
             <Route path="/weekly-review" element={<WeeklyReviewPage />} />
             <Route path="/onboarding" element={<OnboardingPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

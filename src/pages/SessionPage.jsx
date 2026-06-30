@@ -211,6 +211,7 @@ export default function SessionPage() {
 
   const { sessions, getOneRepMaxHistory } = useHistory(user?.id)
   const [prAlert, setPrAlert] = useState(null)
+  const [prs, setPrs] = useState([])
 
   // Compute stats for header
   const completedSets = exercisesDone.reduce((acc, ex) => acc + (ex.sets?.filter(s => s.done).length || 0), 0)
@@ -225,6 +226,7 @@ export default function SessionPage() {
     const bestOrm = history.length > 0 ? Math.max(...history.map(h => h.orm)) : 0
     if (newOrm > bestOrm) {
       setPrAlert({ exerciseName, newOrm })
+      setPrs(prev => [...prev, { exerciseName, newOrm }])
       if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200])
     }
   }
@@ -256,6 +258,12 @@ export default function SessionPage() {
 
     if (session) {
       await fetchAnalysis(session.id, completed, duration)
+      navigate('/session/summary', {
+        state: {
+          session: session,
+          prs: prs
+        }
+      })
     }
     setFinishing(false)
   }

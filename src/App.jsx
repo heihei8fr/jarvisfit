@@ -8,6 +8,7 @@ import SessionPage from './pages/SessionPage'
 import HistoryPage from './pages/HistoryPage'
 import ProgressPage from './pages/ProgressPage'
 import ProgramPage from './pages/ProgramPage'
+import SessionSummaryPage from './pages/SessionSummaryPage'
 
 function Spinner() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/progress" element={<ProgressPage />} />
             <Route path="/program" element={<ProgramPage />} />
+            <Route path="/session/summary" element={<SessionSummaryPage />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </div>

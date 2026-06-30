@@ -11,6 +11,7 @@ import StreakBadge from '../components/StreakBadge'
 import TrainingWeather from '../components/TrainingWeather'
 import WeekStats from '../components/WeekStats'
 import ACWRAlert from '../components/ACWRAlert'
+import PainLogger from '../components/PainLogger'
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
@@ -140,6 +141,9 @@ export default function DashboardPage() {
             )}
           </div>
         )}
+
+        {/* Suivi douleurs */}
+        <PainLogger />
       </div>
     </div>
   )

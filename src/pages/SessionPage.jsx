@@ -3,8 +3,11 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../hooks/useAuth'
 import { useSession } from '../hooks/useSession'
+import { useHistory } from '../hooks/useHistory'
+import { calcOneRepMax } from '../utils/fitness'
 import ExerciseBlock from '../components/ExerciseBlock'
 import AnalysisPanel from '../components/AnalysisPanel'
+import PRAlert from '../components/PRAlert'
 
 function Spinner() {
   return (
@@ -47,6 +50,27 @@ export default function SessionPage() {
 
   const { exercisesDone, updateSet, markSetDone, getDurationMinutes, getCompletedExercises } =
     useSession(program)
+
+  const { getOneRepMaxHistory } = useHistory(user?.id)
+  const [prAlert, setPrAlert] = useState(null)
+
+  function checkPR(exerciseName, weight, reps) {
+    if (!weight || !reps) return
+    const newOrm = calcOneRepMax(weight, reps)
+    const history = getOneRepMaxHistory(exerciseName)
+    const bestOrm = history.length > 0 ? Math.max(...history.map(h => h.orm)) : 0
+    if (newOrm > bestOrm) {
+      setPrAlert({ exerciseName, newOrm })
+      if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200])
+    }
+  }
+
+  function handleSetDone(exerciseIdx, setIdx) {
+    const ex = exercisesDone[exerciseIdx]
+    const set = ex?.sets?.[setIdx]
+    markSetDone(exerciseIdx, setIdx)
+    if (set && ex) checkPR(ex.name, set.weight, set.reps)
+  }
 
   const completedExercises = exercisesDone.filter(ex =>
     ex.sets?.every(s => s.done)
@@ -139,6 +163,13 @@ export default function SessionPage() {
 
   return (
     <div style={{ minHeight:'100vh', background:'var(--bg-base)', paddingBottom:100 }}>
+      {prAlert && (
+        <PRAlert
+          exerciseName={prAlert.exerciseName}
+          newOrm={prAlert.newOrm}
+          onDismiss={() => setPrAlert(null)}
+        />
+      )}
       {/* Sticky header + progress */}
       <div style={{ position:'sticky', top:0, zIndex:40, background:'var(--bg-base)', padding:'12px 16px 8px', borderBottom:'1px solid var(--border)' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
@@ -178,7 +209,7 @@ export default function SessionPage() {
             exercise={ex}
             exerciseIdx={idx}
             onUpdate={updateSet}
-            onSetDone={markSetDone}
+            onSetDone={handleSetDone}
           />
         ))}
 

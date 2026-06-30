@@ -1,14 +1,16 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useProgram } from '../hooks/useProgram'
 import { useHistory } from '../hooks/useHistory'
 import { useStreak } from '../hooks/useStreak'
+import { calcACWR } from '../utils/fitness'
 import ReadinessForm from '../components/ReadinessForm'
 import WeekRing from '../components/WeekRing'
 import StreakBadge from '../components/StreakBadge'
 import TrainingWeather from '../components/TrainingWeather'
 import WeekStats from '../components/WeekStats'
+import ACWRAlert from '../components/ACWRAlert'
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
@@ -18,6 +20,20 @@ export default function DashboardPage() {
   const [readiness, setReadiness] = useState(null)
   const [showAnalysis, setShowAnalysis] = useState(false)
   const navigate = useNavigate()
+
+  const acwr = useMemo(() => {
+    if (!sessions?.length) return null
+    const now = Date.now()
+    const weekMs = 7 * 24 * 60 * 60 * 1000
+    const weeklyLoads = [0, 1, 2, 3].map(w => {
+      const start = now - (w + 1) * weekMs
+      const end = now - w * weekMs
+      return sessions
+        .filter(s => { const d = new Date(s.date).getTime(); return d >= start && d < end })
+        .reduce((acc, s) => acc + (s.duration_minutes || 45), 0)
+    })
+    return calcACWR(weeklyLoads)
+  }, [sessions])
 
   if (loading) return (
     <div style={{ minHeight:'100dvh', display:'flex', alignItems:'center', justifyContent:'center', background:'var(--bg-base)' }}>
@@ -58,6 +74,9 @@ export default function DashboardPage() {
 
         {/* Streak */}
         <StreakBadge current={streakCurrent} best={streakBest} />
+
+        {/* ACWR Alert */}
+        <ACWRAlert ratio={acwr} />
 
         {/* Disponibilité */}
         <ReadinessForm userId={user?.id} onSave={setReadiness} />

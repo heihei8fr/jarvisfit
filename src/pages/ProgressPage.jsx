@@ -14,8 +14,8 @@ const TRACKED_EXERCISES = [
 
 function Spinner() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)' }}>
+      <div style={{ width: 32, height: 32, borderRadius: '50%', border: '3px solid var(--accent)', borderTopColor: 'transparent', animation: 'spin 0.8s linear infinite' }} />
     </div>
   )
 }
@@ -33,53 +33,73 @@ export default function ProgressPage() {
   const progression = currentOrm && firstOrm ? currentOrm - firstOrm : null
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold text-gray-900 mb-4 pt-2">Progression</h1>
-
-      <WeightTracker />
-
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide mt-4">
-        {TRACKED_EXERCISES.map(ex => (
-          <button
-            key={ex}
-            onClick={() => setSelected(ex)}
-            className={`flex-none text-xs px-3 py-1.5 rounded-full font-semibold whitespace-nowrap transition-all ${
-              selected === ex
-                ? 'bg-blue-600 text-white'
-                : 'bg-white border border-gray-200 text-gray-600'
-            }`}
-          >
-            {ex}
-          </button>
-        ))}
+    <div style={{ background: 'var(--bg-base)', minHeight: '100vh' }}>
+      {/* Header */}
+      <div style={{ padding: '20px 20px 16px' }}>
+        <h1 className="page-title">Progression</h1>
+        <p style={{ fontSize: 14, color: 'var(--text-muted)', marginTop: 4 }}>Ton historique complet</p>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
-        <PRChart data={data} exerciseName={selected} />
-      </div>
+      <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <WeightTracker />
 
-      {currentOrm && (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">{currentOrm} kg</div>
-            <div className="text-xs text-gray-400 mt-1">1RM actuel</div>
-          </div>
-          <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center">
-            <div className={`text-2xl font-bold ${progression > 0 ? 'text-green-600' : progression < 0 ? 'text-red-500' : 'text-gray-400'}`}>
-              {progression !== null ? `${progression > 0 ? '+' : ''}${progression} kg` : '—'}
+        {/* Exercise selector */}
+        <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4 }}>
+          {TRACKED_EXERCISES.map(ex => (
+            <button
+              key={ex}
+              onClick={() => setSelected(ex)}
+              style={{
+                flexShrink: 0,
+                padding: '6px 14px',
+                borderRadius: 99,
+                border: `1px solid ${selected === ex ? 'var(--accent)' : 'var(--border-strong)'}`,
+                background: selected === ex ? 'var(--accent-soft)' : 'var(--bg-elevated)',
+                color: selected === ex ? 'var(--accent)' : 'var(--text-secondary)',
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s'
+              }}
+            >
+              {ex}
+            </button>
+          ))}
+        </div>
+
+        {/* Chart card */}
+        <div className="card">
+          <PRChart data={data} exerciseName={selected} />
+        </div>
+
+        {/* Stats */}
+        {currentOrm && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="card" style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 28, fontWeight: 900, color: 'var(--accent)' }}>{currentOrm} kg</div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, fontWeight: 500 }}>1RM actuel</div>
             </div>
-            <div className="text-xs text-gray-400 mt-1">Progression totale</div>
+            <div className="card" style={{ textAlign: 'center' }}>
+              <div style={{
+                fontSize: 28, fontWeight: 900,
+                color: progression > 0 ? 'var(--green)' : progression < 0 ? 'var(--red)' : 'var(--text-muted)'
+              }}>
+                {progression !== null ? `${progression > 0 ? '+' : ''}${progression} kg` : '—'}
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 4, fontWeight: 500 }}>Progression totale</div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {data.length === 0 && (
-        <div className="text-center py-8 text-gray-400">
-          <div className="text-3xl mb-2">📈</div>
-          <p className="text-sm">Commence à logger tes séances</p>
-          <p className="text-xs text-gray-300 mt-1">Ton 1RM estimé apparaîtra ici</p>
-        </div>
-      )}
+        {data.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
+            <div style={{ fontSize: 40, marginBottom: 8 }}>📈</div>
+            <p style={{ fontWeight: 600 }}>Commence à logger tes séances</p>
+            <p style={{ fontSize: 13, marginTop: 4, opacity: 0.7 }}>Ton 1RM estimé apparaîtra ici</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

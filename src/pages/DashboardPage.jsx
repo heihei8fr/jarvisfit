@@ -47,21 +47,25 @@ export default function DashboardPage() {
   const totalThisWeek = weekPrograms?.length || 7
 
   return (
-    <div style={{ background:'var(--bg-base)', minHeight:'100dvh', paddingBottom:80 }}>
-      {/* Header */}
-      <div style={{ padding:'48px 20px 20px', background:'linear-gradient(180deg,#0d0d1a 0%,var(--bg-base) 100%)' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+    <div style={{ background:'var(--bg-base)', minHeight:'100dvh' }}>
+      {/* HEADER */}
+      <div style={{ padding: '20px 20px 0', background: 'linear-gradient(180deg, rgba(99,102,241,0.08) 0%, transparent 100%)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div>
-            <p style={{ color:'var(--text-secondary)', fontSize:12, margin:'0 0 4px', fontWeight:600, textTransform:'uppercase', letterSpacing:'0.06em' }}>
-              {new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})}
+            <p style={{ fontSize: 13, color: 'var(--text-muted)', fontWeight: 500, marginBottom: 2 }}>
+              {new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })}
             </p>
-            <h1 style={{ fontSize:26, fontWeight:800, margin:0, color:'var(--text-primary)' }}>
-              Bonjour Anthony 👋
+            <h1 style={{ fontSize: 26, fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.5px' }}>
+              Bonjour, Anthony 👋
             </h1>
           </div>
-          <button onClick={signOut} style={{ background:'var(--bg-elevated)', border:'1px solid var(--border)', borderRadius:10, padding:'6px 12px', color:'var(--text-secondary)', fontSize:12, cursor:'pointer' }}>
-            Déco
-          </button>
+          <div style={{
+            width: 44, height: 44, borderRadius: '50%',
+            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 20, fontWeight: 800, color: '#fff',
+            boxShadow: '0 4px 16px rgba(99,102,241,0.4)'
+          }}>A</div>
         </div>
       </div>
 

@@ -148,6 +148,25 @@ export default function DashboardPage() {
 
         {/* Suivi douleurs */}
         <PainLogger />
+
+        {/* Bilan hebdomadaire */}
+        <div
+          className="card"
+          onClick={() => navigate('/weekly-review')}
+          style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14 }}
+        >
+          <div style={{
+            width: 44, height: 44, borderRadius: 14,
+            background: 'linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.2))',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0
+          }}>🤖</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: 15, fontWeight: 800, color: 'var(--text-primary)' }}>Bilan hebdomadaire</p>
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginTop: 2 }}>Analyse IA de ta semaine</p>
+          </div>
+          <span style={{ color: 'var(--text-muted)', fontSize: 18 }}>›</span>
+        </div>
+
       </div>
     </div>
   )

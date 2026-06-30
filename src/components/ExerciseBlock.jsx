@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import SetRow from './SetRow'
 import RestTimer from './RestTimer'
+import { suggestWeight } from '../utils/weightSuggestion'
+import WeightSuggestion from './WeightSuggestion'
 
-export default function ExerciseBlock({ exercise, exerciseIdx, onUpdate, onSetDone }) {
+export default function ExerciseBlock({ exercise, exerciseIdx, onUpdate, onSetDone, sessions }) {
   const [showTimer, setShowTimer] = useState(false)
   const [timerSeconds, setTimerSeconds] = useState(exercise.rest || 90)
 
@@ -13,6 +15,8 @@ export default function ExerciseBlock({ exercise, exerciseIdx, onUpdate, onSetDo
       setShowTimer(true)
     }
   }
+
+  const suggestion = suggestWeight(exercise.name, exercise.weight || 0, sessions)
 
   const allDone = exercise.sets?.every(s => s.done)
   const doneSets = exercise.sets?.filter(s => s.done).length || 0
@@ -70,6 +74,7 @@ export default function ExerciseBlock({ exercise, exerciseIdx, onUpdate, onSetDo
 
       {/* Sets */}
       <div style={{ padding:'4px 16px 8px' }}>
+        <WeightSuggestion suggestion={suggestion} />
         {exercise.sets.map((set, setIdx) => (
           <SetRow
             key={setIdx}

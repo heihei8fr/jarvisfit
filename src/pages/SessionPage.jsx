@@ -51,7 +51,7 @@ export default function SessionPage() {
   const { exercisesDone, updateSet, markSetDone, getDurationMinutes, getCompletedExercises } =
     useSession(program)
 
-  const { getOneRepMaxHistory } = useHistory(user?.id)
+  const { sessions, getOneRepMaxHistory } = useHistory(user?.id)
   const [prAlert, setPrAlert] = useState(null)
 
   function checkPR(exerciseName, weight, reps) {
@@ -210,6 +210,7 @@ export default function SessionPage() {
             exerciseIdx={idx}
             onUpdate={updateSet}
             onSetDone={handleSetDone}
+            sessions={sessions}
           />
         ))}
 

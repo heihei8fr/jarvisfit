@@ -1,6 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { useProfile } from '../hooks/useProfile'
 import { useProgram } from '../hooks/useProgram'
 import { useHistory } from '../hooks/useHistory'
 import { useStreak } from '../hooks/useStreak'
@@ -15,7 +16,14 @@ import PainLogger from '../components/PainLogger'
 
 export default function DashboardPage() {
   const { user, signOut } = useAuth()
+  const { profile, loading: profileLoading } = useProfile(user?.id)
   const { todayProgram, weekPrograms, lastAnalysis, loading } = useProgram(user?.id)
+
+  useEffect(() => {
+    if (!profileLoading && profile !== null && !profile?.onboarding_done) {
+      navigate('/onboarding')
+    }
+  }, [profile, profileLoading])
   const { sessions } = useHistory(user?.id)
   const { current: streakCurrent, best: streakBest } = useStreak(sessions)
   const [readiness, setReadiness] = useState(null)

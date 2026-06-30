@@ -8,11 +8,18 @@ import AnalysisPanel from '../components/AnalysisPanel'
 
 function Spinner() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'var(--bg-base)' }}>
+      <div style={{ width:32, height:32, border:'3px solid var(--accent)', borderTopColor:'transparent', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
     </div>
   )
 }
+
+const FEELINGS = [
+  { value: 'great', emoji: '🔥', label: 'Top' },
+  { value: 'good', emoji: '😊', label: 'Bien' },
+  { value: 'average', emoji: '😐', label: 'Moyen' },
+  { value: 'bad', emoji: '😓', label: 'Dur' },
+]
 
 export default function SessionPage() {
   const { programId } = useParams()
@@ -22,6 +29,7 @@ export default function SessionPage() {
   const [feeling, setFeeling] = useState('good')
   const [finishing, setFinishing] = useState(false)
   const [analysis, setAnalysis] = useState(null)
+  const [elapsedMinutes, setElapsedMinutes] = useState(0)
 
   useEffect(() => {
     supabase
@@ -32,8 +40,19 @@ export default function SessionPage() {
       .then(({ data }) => setProgram(data))
   }, [programId])
 
+  useEffect(() => {
+    const interval = setInterval(() => setElapsedMinutes(m => m + 1), 60000)
+    return () => clearInterval(interval)
+  }, [])
+
   const { exercisesDone, updateSet, markSetDone, getDurationMinutes, getCompletedExercises } =
     useSession(program)
+
+  const completedExercises = exercisesDone.filter(ex =>
+    ex.sets?.every(s => s.done)
+  ).length
+  const totalExercises = exercisesDone.length
+  const progressPct = totalExercises > 0 ? (completedExercises / totalExercises) * 100 : 0
 
   async function finishSession() {
     setFinishing(true)
@@ -119,55 +138,85 @@ export default function SessionPage() {
   if (analysis !== null) return <AnalysisPanel analysis={analysis} onClose={() => navigate('/')} />
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 max-w-lg mx-auto">
-      <div className="flex items-center gap-3 mb-4 pt-2">
-        <button onClick={() => navigate('/')} className="text-gray-400 text-xl">←</button>
-        <div>
-          <h1 className="text-base font-bold text-gray-900">{program.session_type}</h1>
-          <p className="text-xs text-gray-500">{program.exercises?.length} exercices · {program.label}</p>
+    <div style={{ minHeight:'100vh', background:'var(--bg-base)', paddingBottom:100 }}>
+      {/* Sticky header + progress */}
+      <div style={{ position:'sticky', top:0, zIndex:40, background:'var(--bg-base)', padding:'12px 16px 8px', borderBottom:'1px solid var(--border)' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8 }}>
+          <button
+            onClick={() => navigate('/')}
+            style={{ background:'var(--bg-elevated)', border:'1px solid var(--border)', borderRadius:10, padding:'6px 12px', color:'var(--text-secondary)', fontSize:13, cursor:'pointer' }}
+          >
+            ← Retour
+          </button>
+          <div style={{ textAlign:'center' }}>
+            <div style={{ fontSize:13, fontWeight:700, color:'var(--text-primary)' }}>{program.session_type}</div>
+            <div style={{ fontSize:11, color:'var(--text-secondary)' }}>{elapsedMinutes} min</div>
+          </div>
+          <div style={{ width:70 }} />
+        </div>
+
+        <div style={{ background:'var(--border)', borderRadius:99, height:4, overflow:'hidden' }}>
+          <div style={{
+            background:'linear-gradient(90deg,#6366f1,#8b5cf6)',
+            height:'100%',
+            width:`${progressPct}%`,
+            borderRadius:99,
+            transition:'width 0.4s ease'
+          }} />
+        </div>
+        <div style={{ display:'flex', justifyContent:'space-between', marginTop:4 }}>
+          <span style={{ fontSize:11, color:'var(--text-secondary)' }}>{completedExercises} / {totalExercises} exercices</span>
+          <span style={{ fontSize:11, color:'#6366f1', fontWeight:600 }}>{Math.round(progressPct)}%</span>
         </div>
       </div>
 
-      {exercisesDone.map((ex, idx) => (
-        <ExerciseBlock
-          key={idx}
-          exercise={ex}
-          exerciseIdx={idx}
-          onUpdate={updateSet}
-          onSetDone={markSetDone}
-        />
-      ))}
+      {/* Exercices */}
+      <div style={{ padding:'16px 16px 0' }}>
+        {exercisesDone.map((ex, idx) => (
+          <ExerciseBlock
+            key={idx}
+            exercise={ex}
+            exerciseIdx={idx}
+            onUpdate={updateSet}
+            onSetDone={markSetDone}
+          />
+        ))}
 
-      <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
-        <h3 className="text-sm font-bold text-gray-800 mb-3">Ressenti global de la séance</h3>
-        <div className="grid grid-cols-4 gap-2">
-          {[
-            ['great', '🔥', 'Top'],
-            ['good', '😊', 'Bien'],
-            ['average', '😐', 'Moyen'],
-            ['bad', '😓', 'Dur']
-          ].map(([val, emoji, label]) => (
-            <button
-              key={val}
-              onClick={() => setFeeling(val)}
-              className={`rounded-xl p-2 text-center text-xs font-semibold transition-all ${
-                feeling === val ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              <div className="text-xl mb-1">{emoji}</div>
-              {label}
-            </button>
-          ))}
+        {/* Feeling */}
+        <div className="card" style={{ marginBottom:16 }}>
+          <h3 style={{ fontSize:14, fontWeight:700, color:'var(--text-primary)', marginBottom:12 }}>Ressenti global</h3>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+            {FEELINGS.map(({ value, emoji, label }) => (
+              <button
+                key={value}
+                onClick={() => setFeeling(value)}
+                style={{
+                  background: feeling === value ? 'var(--accent)' : 'var(--bg-elevated)',
+                  border: `1px solid ${feeling === value ? 'var(--accent)' : 'var(--border)'}`,
+                  borderRadius:12,
+                  padding:'12px 8px',
+                  textAlign:'center',
+                  cursor:'pointer',
+                  transition:'all 0.2s'
+                }}
+              >
+                <div style={{ fontSize:24, marginBottom:4 }}>{emoji}</div>
+                <div style={{ fontSize:12, fontWeight:600, color: feeling === value ? '#fff' : 'var(--text-secondary)' }}>{label}</div>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
 
-      <button
-        onClick={finishSession}
-        disabled={finishing}
-        className="w-full bg-blue-600 text-white rounded-2xl py-4 font-bold text-base mb-6 disabled:opacity-50"
-      >
-        {finishing ? 'Enregistrement...' : 'Terminer et analyser avec Claude 🤖'}
-      </button>
+        {/* Finish button */}
+        <button
+          className="btn-primary"
+          onClick={finishSession}
+          disabled={finishing}
+          style={{ width:'100%', marginTop:8, opacity: finishing ? 0.7 : 1, fontSize:15 }}
+        >
+          {finishing ? '⏳ Analyse en cours...' : '✅ Terminer la séance'}
+        </button>
+      </div>
     </div>
   )
 }

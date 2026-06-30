@@ -1,9 +1,9 @@
 import { useState } from 'react'
 
 const RPE_OPTIONS = [
-  { value: 'easy', label: 'Facile', color: 'bg-green-100 text-green-700' },
-  { value: 'normal', label: 'Normal', color: 'bg-yellow-100 text-yellow-700' },
-  { value: 'hard', label: 'Difficile', color: 'bg-red-100 text-red-700' }
+  { value: 'easy', label: '😌 Easy', bg: 'rgba(16,185,129,0.15)', color: '#10b981' },
+  { value: 'normal', label: '💪 Normal', bg: 'rgba(245,158,11,0.15)', color: '#f59e0b' },
+  { value: 'hard', label: '🔥 Hard', bg: 'rgba(239,68,68,0.15)', color: '#ef4444' },
 ]
 
 export default function SetRow({ set, exerciseIdx, setIdx, onUpdate, onDone }) {
@@ -21,62 +21,91 @@ export default function SetRow({ set, exerciseIdx, setIdx, onUpdate, onDone }) {
 
   if (set.done) {
     return (
-      <div className="flex items-center gap-2 py-2 opacity-50">
-        <span className="text-green-500 font-bold text-sm">✓</span>
-        <span className="text-sm text-gray-600">
-          {set.setNumber}. {set.weight > 0 ? `${set.weight}kg × ` : ''}{set.reps > 0 ? `${set.reps} reps` : 'max'}
+      <div style={{ display:'flex', alignItems:'center', gap:10, padding:'8px 0', opacity:0.55, background:'rgba(99,102,241,0.04)', borderRadius:8, marginBottom:4, paddingLeft:8 }}>
+        <div style={{
+          width:24, height:24, borderRadius:'50%',
+          background:'#10b981', display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:12, color:'#fff', fontWeight:800, flexShrink:0
+        }}>✓</div>
+        <span style={{ fontSize:13, color:'var(--text-secondary)', fontWeight:600 }}>
+          Set {set.setNumber} — {set.weight > 0 ? `${set.weight}kg × ` : ''}{set.reps > 0 ? `${set.reps} reps` : 'max'}
         </span>
-        {set.rpe && <span className="text-xs text-gray-400 ml-auto">{set.rpe}</span>}
+        {set.rpe && (
+          <span style={{ fontSize:11, color:'var(--text-secondary)', marginLeft:'auto', paddingRight:8 }}>{set.rpe}</span>
+        )}
       </div>
     )
   }
 
   return (
-    <div className="py-3 border-b border-gray-50 last:border-0">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-xs font-bold text-gray-400 w-4 shrink-0">{set.setNumber}</span>
+    <div style={{ paddingTop:8, paddingBottom:4, borderBottom:'1px solid var(--border)', marginBottom:4 }}>
+      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+        {/* Set number circle */}
+        <div style={{
+          width:28, height:28, borderRadius:'50%',
+          background:'var(--bg-elevated)', border:'1px solid var(--border)',
+          display:'flex', alignItems:'center', justifyContent:'center',
+          fontSize:12, fontWeight:800, color:'var(--text-secondary)', flexShrink:0
+        }}>
+          {set.setNumber}
+        </div>
 
+        {/* Weight control */}
         {set.weight > 0 && (
-          <div className="flex items-center bg-gray-100 rounded-xl overflow-hidden">
+          <div style={{ display:'flex', alignItems:'center', background:'var(--bg-elevated)', border:'1px solid var(--border)', borderRadius:10, overflow:'hidden' }}>
             <button
               onClick={() => onUpdate(exerciseIdx, setIdx, 'weight', Math.max(0, set.weight - 2.5))}
-              className="px-3 py-2 text-gray-600 font-bold text-lg active:bg-gray-200"
+              style={{ padding:'6px 10px', background:'transparent', border:'none', color:'var(--text-secondary)', fontSize:18, fontWeight:700, cursor:'pointer' }}
             >−</button>
-            <span className="px-2 text-sm font-bold min-w-[52px] text-center">{set.weight}kg</span>
+            <span style={{ padding:'0 4px', fontSize:14, fontWeight:800, color:'var(--text-primary)', minWidth:52, textAlign:'center' }}>{set.weight}kg</span>
             <button
               onClick={() => onUpdate(exerciseIdx, setIdx, 'weight', set.weight + 2.5)}
-              className="px-3 py-2 text-gray-600 font-bold text-lg active:bg-gray-200"
+              style={{ padding:'6px 10px', background:'transparent', border:'none', color:'var(--text-secondary)', fontSize:18, fontWeight:700, cursor:'pointer' }}
             >+</button>
           </div>
         )}
 
-        <div className="flex items-center bg-gray-100 rounded-xl overflow-hidden">
+        {/* Reps control */}
+        <div style={{ display:'flex', alignItems:'center', background:'var(--bg-elevated)', border:'1px solid var(--border)', borderRadius:10, overflow:'hidden' }}>
           <button
             onClick={() => onUpdate(exerciseIdx, setIdx, 'reps', Math.max(0, set.reps - 1))}
-            className="px-3 py-2 text-gray-600 font-bold text-lg active:bg-gray-200"
+            style={{ padding:'6px 10px', background:'transparent', border:'none', color:'var(--text-secondary)', fontSize:18, fontWeight:700, cursor:'pointer' }}
           >−</button>
-          <span className="px-2 text-sm font-bold min-w-[36px] text-center">
+          <span style={{ padding:'0 4px', fontSize:14, fontWeight:800, color:'var(--text-primary)', minWidth:36, textAlign:'center' }}>
             {set.reps === 0 ? 'max' : set.reps}
           </span>
           <button
             onClick={() => onUpdate(exerciseIdx, setIdx, 'reps', set.reps + 1)}
-            className="px-3 py-2 text-gray-600 font-bold text-lg active:bg-gray-200"
+            style={{ padding:'6px 10px', background:'transparent', border:'none', color:'var(--text-secondary)', fontSize:18, fontWeight:700, cursor:'pointer' }}
           >+</button>
         </div>
 
+        {/* Done button */}
         <button
           onClick={handleDone}
-          className="ml-auto bg-blue-600 text-white rounded-xl px-4 py-2 text-sm font-bold active:bg-blue-700"
+          style={{
+            marginLeft:'auto',
+            background:'linear-gradient(135deg,#6366f1,#8b5cf6)',
+            border:'none', borderRadius:10,
+            padding:'8px 14px', color:'#fff',
+            fontSize:14, fontWeight:800, cursor:'pointer',
+            flexShrink:0
+          }}
         >✓</button>
       </div>
 
+      {/* RPE selection */}
       {showRpe && (
-        <div className="flex gap-2 mt-1">
+        <div style={{ display:'flex', gap:8, marginTop:8 }}>
           {RPE_OPTIONS.map(opt => (
             <button
               key={opt.value}
               onClick={() => handleRpe(opt.value)}
-              className={`flex-1 text-xs py-1.5 rounded-lg font-semibold ${opt.color}`}
+              style={{
+                flex:1, padding:'8px 4px', borderRadius:10,
+                background:opt.bg, border:`1px solid ${opt.color}`,
+                color:opt.color, fontSize:12, fontWeight:700, cursor:'pointer'
+              }}
             >
               {opt.label}
             </button>

@@ -6,11 +6,13 @@ import DashboardPage from './pages/DashboardPage'
 import SessionPage from './pages/SessionPage'
 import HistoryPage from './pages/HistoryPage'
 import ProgressPage from './pages/ProgressPage'
+import ProgramPage from './pages/ProgramPage'
 
 function NavBar() {
   const links = [
     { to: '/', icon: '🏠', label: 'Accueil' },
     { to: '/history', icon: '📋', label: 'Historique' },
+    { to: '/program', icon: '📅', label: 'Programme' },
     { to: '/progress', icon: '📈', label: 'Stats' },
   ]
   return (
@@ -60,6 +62,7 @@ export default function App() {
           <Route path="/session/:programId" element={<SessionPage />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/progress" element={<ProgressPage />} />
+          <Route path="/program" element={<ProgramPage />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>

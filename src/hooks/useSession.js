@@ -1,19 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export function useSession(program) {
   const [startTime] = useState(Date.now())
-  const [exercisesDone, setExercisesDone] = useState(
-    () => (program?.exercises || []).map(ex => ({
-      ...ex,
-      sets: Array.from({ length: ex.sets || 1 }, (_, i) => ({
-        setNumber: i + 1,
-        weight: ex.weight || 0,
-        reps: ex.reps || 0,
-        rpe: null,
-        done: false
+  const [exercisesDone, setExercisesDone] = useState([])
+
+  useEffect(() => {
+    if (!program?.exercises?.length) return
+    setExercisesDone(
+      program.exercises.map(ex => ({
+        ...ex,
+        sets: Array.from({ length: ex.sets || 1 }, (_, i) => ({
+          setNumber: i + 1,
+          weight: ex.weight || 0,
+          reps: ex.reps || 0,
+          rpe: null,
+          done: false
+        }))
       }))
-    }))
-  )
+    )
+  }, [program?.id])
 
   function updateSet(exerciseIdx, setIdx, field, value) {
     setExercisesDone(prev => {

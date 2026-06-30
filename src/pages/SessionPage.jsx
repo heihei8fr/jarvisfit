@@ -445,7 +445,7 @@ export default function SessionPage() {
         {/* Finish button */}
         <div style={{ padding: '0 16px' }}>
           <button
-            className="btn-primary"
+            className="btn-primary pressable"
             onClick={finishSession}
             disabled={finishing}
             style={{ opacity: finishing ? 0.7 : 1 }}

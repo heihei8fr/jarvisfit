@@ -1,4 +1,4 @@
-﻿import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './hooks/useAuth'
 import InstallPrompt from './components/InstallPrompt'
 import BottomNav from './components/BottomNav'
@@ -30,7 +30,7 @@ function SplashScreen() {
         boxShadow: '0 8px 40px rgba(99,102,241,0.5)',
         animation: 'pulse 2s ease-in-out infinite'
       }}>
-        {‘💪’}
+        {'💪'}
       </div>
       <div style={{ textAlign: 'center' }}>
         <h1 style={{

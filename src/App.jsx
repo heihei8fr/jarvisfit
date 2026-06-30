@@ -8,6 +8,7 @@ import SessionPage from './pages/SessionPage'
 import HistoryPage from './pages/HistoryPage'
 import ProgressPage from './pages/ProgressPage'
 import ProgramPage from './pages/ProgramPage'
+import SessionDetailPage from './pages/SessionDetailPage'
 import SessionSummaryPage from './pages/SessionSummaryPage'
 import WeeklyReviewPage from './pages/WeeklyReviewPage'
 import OnboardingPage from './pages/OnboardingPage'
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/session/:programId" element={<SessionPage />} />
             <Route path="/history" element={<HistoryPage />} />
+            <Route path="/history/:id" element={<SessionDetailPage />} />
             <Route path="/progress" element={<ProgressPage />} />
             <Route path="/program" element={<ProgramPage />} />
             <Route path="/session/summary" element={<SessionSummaryPage />} />

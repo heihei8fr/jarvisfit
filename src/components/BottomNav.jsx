@@ -4,6 +4,7 @@ const NAV_ITEMS = [
   { to: '/', icon: '⊞', label: 'Accueil', exact: true },
   { to: '/session', icon: '⚡', label: 'Séance' },
   { to: '/program', icon: '📅', label: 'Programme' },
+  { to: '/history', icon: '🕐', label: 'Historique' },
   { to: '/progress', icon: '📊', label: 'Stats' },
 ]
 

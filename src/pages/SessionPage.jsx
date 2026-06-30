@@ -8,7 +8,7 @@ import { calcOneRepMax } from '../utils/fitness'
 import AnalysisPanel from '../components/AnalysisPanel'
 import PRAlert from '../components/PRAlert'
 import WeightSuggestion from '../components/WeightSuggestion'
-import RestTimer from '../components/RestTimer'
+import RestTimerModal from '../components/RestTimerModal'
 import { suggestWeight } from '../utils/weightSuggestion'
 
 function Spinner() {
@@ -110,15 +110,8 @@ function SetRowPro({ set, setIdx, exerciseIdx, onUpdate, onDone }) {
 }
 
 function ExerciseBlockPro({ exercise, exerciseIdx, onUpdate, onSetDone, sessions }) {
-  const [showTimer, setShowTimer] = useState(false)
-  const [timerSeconds, setTimerSeconds] = useState(exercise.rest || 90)
-
   function handleSetDone(exIdx, setIdx) {
     onSetDone(exIdx, setIdx)
-    if ((exercise.rest || 0) > 0) {
-      setTimerSeconds(exercise.rest)
-      setShowTimer(true)
-    }
   }
 
   const suggestion = suggestWeight(exercise.name, exercise.weight || 0, sessions)
@@ -166,12 +159,6 @@ function ExerciseBlockPro({ exercise, exerciseIdx, onUpdate, onSetDone, sessions
         />
       ))}
 
-      {showTimer && (
-        <RestTimer
-          seconds={timerSeconds}
-          onDone={() => setShowTimer(false)}
-        />
-      )}
     </div>
   )
 }
@@ -212,6 +199,13 @@ export default function SessionPage() {
   const { sessions, getOneRepMaxHistory } = useHistory(user?.id)
   const [prAlert, setPrAlert] = useState(null)
   const [prs, setPrs] = useState([])
+  const [restTimer, setRestTimer] = useState(null) // { exerciseName, seconds }
+
+  function getRestSeconds(exerciseName) {
+    const compound = ['squat', 'bench', 'deadlift', 'press', 'row', 'pull', 'soulevé', 'développé', 'tirage']
+    const name = (exerciseName || '').toLowerCase()
+    return compound.some(c => name.includes(c)) ? 180 : 90
+  }
 
   // Compute stats for header
   const completedSets = exercisesDone.reduce((acc, ex) => acc + (ex.sets?.filter(s => s.done).length || 0), 0)
@@ -236,6 +230,12 @@ export default function SessionPage() {
     const set = ex?.sets?.[setIdx]
     markSetDone(exerciseIdx, setIdx)
     if (set && ex) checkPR(ex.name, set.weight, set.reps)
+    if (ex) {
+      setRestTimer({
+        exerciseName: ex.name,
+        seconds: getRestSeconds(ex.name)
+      })
+    }
   }
 
   async function finishSession() {
@@ -334,6 +334,14 @@ export default function SessionPage() {
           exerciseName={prAlert.exerciseName}
           newOrm={prAlert.newOrm}
           onDismiss={() => setPrAlert(null)}
+        />
+      )}
+
+      {restTimer && (
+        <RestTimerModal
+          defaultSeconds={restTimer.seconds}
+          exerciseName={restTimer.exerciseName}
+          onClose={() => setRestTimer(null)}
         />
       )}
 

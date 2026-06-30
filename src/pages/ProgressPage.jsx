@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useHistory } from '../hooks/useHistory'
 import PRChart from '../components/PRChart'
 import WeightTracker from '../components/WeightTracker'
+import ActivityCalendar from '../components/ActivityCalendar'
 
 const TRACKED_EXERCISES = [
   'Développé couché barre',
@@ -22,7 +23,7 @@ function Spinner() {
 
 export default function ProgressPage() {
   const { user } = useAuth()
-  const { getOneRepMaxHistory, loading } = useHistory(user?.id)
+  const { sessions, getOneRepMaxHistory, loading } = useHistory(user?.id)
   const [selected, setSelected] = useState(TRACKED_EXERCISES[0])
 
   if (loading) return <Spinner />
@@ -41,6 +42,7 @@ export default function ProgressPage() {
       </div>
 
       <div style={{ padding: '0 16px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <ActivityCalendar sessions={sessions || []} />
         <WeightTracker />
 
         {/* Exercise selector */}
